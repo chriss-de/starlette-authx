@@ -9,7 +9,7 @@ with open(os.path.join(here, 'README.md'), 'r') as fh:
 
 setuptools.setup(
     name='starlette-authx',
-    version='0.0.4',
+    version='0.0.5',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Christoph Hartmann',
@@ -29,7 +29,7 @@ setuptools.setup(
         'jinja2>=2,<3',
     ],
     extras_require={
-        'gql': 'graphene>2.1,<3',
-        'fastapi': 'fastapi>=0.54,<1',
+        'gql': ['graphene>2.1,<3'],
+        'fastapi': ['fastapi>=0.54,<1'],
     },
 )
