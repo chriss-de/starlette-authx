@@ -8,7 +8,7 @@ def _get_authx_config(context, name):
 
 def has_ipaccess(context, name):
     config = _get_authx_config(context, 'ipaccess')
-    if (name is None and len(config) > 0) or name in config:
+    if len(config) > 0 and (name is None or name in config):
         return True
     return False
 
@@ -20,9 +20,9 @@ def has_token_attr(context, key, value):
     return False
 
 
-def is_bearer_auth(context):
+def is_bearer_auth(context, provider):
     config = _get_authx_config(context, 'bearer')
-    if len(config) > 0:
+    if len(config) > 0 and (provider is None or provider == config['__provider_name']):
         return True
     return False
 
