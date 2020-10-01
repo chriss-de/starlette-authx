@@ -42,6 +42,8 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
                     client_bearer_auth_results['__provider_name'] = provider
             except jose.exceptions.JWSError as e:
                 raise InvalidToken(str(e))
+            except jose.exceptions.JWTClaimsError as e:
+                pass
             except jose.exceptions.JWTError as e:
                 raise InvalidToken(str(e))
             except jose.exceptions.JOSEError as e:
