@@ -40,10 +40,12 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
                 else:
                     client_bearer_auth_results = result
                     client_bearer_auth_results['__provider_name'] = provider
-            except jose.exceptions.ExpiredSignatureError as e:
+            except jose.exceptions.JWSError as e:
+                raise InvalidToken(str(e))
+            except jose.exceptions.JWTError as e:
                 raise InvalidToken(str(e))
             except jose.exceptions.JOSEError as e:
-                raise InvalidToken(str(e))
+                logging.debug(str(e))
 
     return client_bearer_auth_results
 

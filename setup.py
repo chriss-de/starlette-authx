@@ -9,7 +9,7 @@ with open(os.path.join(here, 'README.md'), 'r') as fh:
 
 setuptools.setup(
     name='starlette-authx',
-    version='0.0.6',
+    version='0.0.7',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Christoph Hartmann',
