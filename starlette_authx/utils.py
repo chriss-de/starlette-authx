@@ -68,7 +68,7 @@ _environment.globals.update(
 )
 
 
-def validator(condition="False", config={}) -> bool:
+def validator(condition="False", config={}, **kwargs) -> bool:
     template = _environment.from_string(f"{{{{ {condition} }}}}")
-    result = template.render(authx=config)
+    result = template.render(authx=config, call_env=kwargs)
     return False if result != 'True' else True
