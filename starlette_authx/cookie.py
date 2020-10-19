@@ -18,7 +18,9 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> List:
             cookie_data = http_connection.cookies[cookie_config].encode('utf-8')
             cookie_enc_key = config[cookie_config]['secret']
             cookie_signer = itsdangerous.TimestampSigner(str(cookie_enc_key))
-            cookie_max_age = MAX_AGE if config[cookie_config]['max_age'] is None else config[cookie_config]['max_age']
+            cookie_max_age = MAX_AGE \
+                if config[cookie_config].get('max_age', None) is None \
+                else config[cookie_config]['max_age']
             try:
                 cookie_data = cookie_signer.unsign(cookie_data, cookie_max_age)
                 cookie_data = json.loads(b64decode(cookie_data))
