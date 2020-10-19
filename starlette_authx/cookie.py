@@ -2,10 +2,8 @@ from starlette.types import Receive, Scope, Send
 from starlette.requests import HTTPConnection
 from base64 import b64decode
 import itsdangerous
-from itsdangerous.exc import BadTimeSignature, SignatureExpired
-import binascii
+from itsdangerous.exc import BadTimeSignature, BadSignature
 import json
-import logging
 from typing import List
 
 MAX_AGE: int = 31 * 24 * 60 * 60  # a month in seconds
@@ -26,10 +24,7 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> List:
             try:
                 _cookie_data = _cookie_signer.unsign(_cookie_data, _cookie_max_age)
                 _cookie_data = json.loads(b64decode(_cookie_data))
-            except (BadTimeSignature, BadTimeSignature, SignatureExpired, binascii.Error) as e:
+            except (BadSignature, BadTimeSignature, Exception) as e:
                 _cookie_data = {}
-            except Exception as e:
-                _cookie_data = {}
-                logging.error(str(e))
             cookie_data.update({cookie_config: _cookie_data})
     return cookie_data
