@@ -1,7 +1,7 @@
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Scope, Receive, Send
 
-from . import ipaccess, merge_auth_info, basic, bearer, utils, InvalidToken
+from . import ipaccess, merge_auth_info, basic, bearer, utils, InvalidToken, cookie
 
 
 class AuthXMiddleware:
@@ -42,6 +42,10 @@ class AuthXMiddleware:
                 result = ipaccess.process(self._config.get('ipaccess'), scope, receive, send)
                 if len(result) > 0:
                     merge_auth_info(scope, {'ipaccess': result})
+            if 'cookie' in self._config:
+                result = cookie.process(self._config.get('cookie'), scope, receive, send)
+                if len(result) > 0:
+                    merge_auth_info(scope, {'cookie': result})
             if 'basic' in self._config:
                 result = basic.process(self._config.get('basic'), scope, receive, send)
                 if 'username' in result:

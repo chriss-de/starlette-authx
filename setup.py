@@ -27,6 +27,7 @@ setuptools.setup(
         'python-jose>=3,<4',
         'passlib>=1,<2',
         'jinja2>=2,<3',
+        'itsdangerous>1.1.0,<2'
     ],
     extras_require={
         'gql': ['graphene>2.1,<3'],

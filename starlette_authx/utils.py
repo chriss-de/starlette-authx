@@ -6,7 +6,7 @@ def _get_authx_config(context, name):
     return context.parent.get('authx', {}).get(name, {})
 
 
-def has_ipaccess(context, name):
+def has_ipaccess(context, name=None):
     config = _get_authx_config(context, 'ipaccess')
     if len(config) > 0 and (name is None or name in config):
         return True
@@ -20,7 +20,7 @@ def has_token_attr(context, key, value):
     return False
 
 
-def is_bearer_auth(context, provider):
+def is_bearer_auth(context, provider=None):
     config = _get_authx_config(context, 'bearer')
     if len(config) > 0 and (provider is None or provider == config['__provider_name']):
         return True
@@ -34,9 +34,9 @@ def has_basic_auth(context):
     return False
 
 
-def is_basic_user(context, user):
+def is_basic_user(context, user=None):
     config = _get_authx_config(context, 'basic')
-    if config.get('username') == user:
+    if len(config) > 0 and (user is None or config.get('username') == user):
         return True
     return False
 
@@ -68,6 +68,7 @@ _environment.globals.update(
 )
 
 
+# TODO: @lru_cache
 def validator(condition="False", config={}, **kwargs) -> bool:
     template = _environment.from_string(f"{{{{ {condition} }}}}")
     result = template.render(authx=config, call_env=kwargs)
