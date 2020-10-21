@@ -4,13 +4,27 @@ import jose.jwt
 import logging
 from starlette.requests import Request
 from starlette.types import Receive, Scope, Send
-from . import InvalidToken
+from . import InvalidToken, merge_auth_info
 
 _jwt_keys = {}
 
 """
 this stuff is mostly from https://gitlab.com/jorgecarleitao/starlette-oauth2-api
 """
+
+
+def validate_config(config):
+    providers = config.get('providers')
+    mandatory_keys = {'issuer', 'keys', 'audience'}
+    for provider in providers:
+        if not mandatory_keys.issubset(set(providers[provider])):
+            raise ValueError(
+                f'Each provider must contain the following keys: {mandatory_keys}. Provider "{provider}" is missing {mandatory_keys - set(providers[provider])}.')
+
+        keys = providers[provider]['keys']
+        if isinstance(keys, str) and keys.startswith('http://'):
+            raise ValueError(
+                f'When "keys" is a url, it must start with "https://". This is not true in the provider "{provider}"')
 
 
 def _get_keys(url_or_keys):
@@ -21,7 +35,7 @@ def _get_keys(url_or_keys):
         return url_or_keys
 
 
-def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
+async def process(config, scope: Scope, receive: Receive, send: Send) -> None:
     """
     this stuff is mostly from https://gitlab.com/jorgecarleitao/starlette-oauth2-api
     """
@@ -49,7 +63,8 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
             except jose.exceptions.JOSEError as e:
                 logging.debug(str(e))
 
-    return client_bearer_auth_results
+    if len(client_bearer_auth_results) > 0:
+        merge_auth_info(scope, {'bearer': client_bearer_auth_results})
 
 
 def _provider_claims(provider_name, provider, token):

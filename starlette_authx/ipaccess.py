@@ -1,9 +1,14 @@
 from starlette.types import Receive, Scope, Send
 import ipaddress
-from typing import List
+from . import merge_auth_info
 
 
-def process(config, scope: Scope, receive: Receive, send: Send) -> List:
+def validate_config(config):
+    # valid networks?
+    pass
+
+
+async def process(config, scope: Scope, receive: Receive, send: Send) -> None:
     client_networks = []
     client_ip_address = ipaddress.ip_address(scope['client'][0])
 
@@ -12,4 +17,5 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> List:
             if client_ip_address in ipaddress.ip_interface(ip_address).network:
                 client_networks.append(ip_access)
 
-    return set(client_networks)
+    if len(client_networks) > 0:
+        merge_auth_info(scope, {'ipaccess': set(client_networks)})

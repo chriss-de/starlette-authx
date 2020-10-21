@@ -3,8 +3,18 @@ from starlette.types import Receive, Scope, Send
 from base64 import b64decode
 import binascii
 from passlib.apache import HtpasswdFile
-from . import InvalidToken
+from . import InvalidToken, merge_auth_info
 import logging
+import os
+
+
+def validate_config(config):
+    for _config, _config_data in config.items():
+        if not isinstance(_config_data, list):
+            raise ValueError(f'Values to {_config} should be a list of files')
+        for file in _config_data:
+            if not os.path.exists(file):
+                logging.warning(f"file '{file}' not found")
 
 
 def check_against_htpasswd(htpasswd_file, username, password):
@@ -16,7 +26,7 @@ def check_against_htpasswd(htpasswd_file, username, password):
         return False
 
 
-def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
+async def process(config, scope: Scope, receive: Receive, send: Send) -> None:
     client_basic_auth_results = {'groups': []}
     request = Request(scope)
 
@@ -41,4 +51,5 @@ def process(config, scope: Scope, receive: Receive, send: Send) -> dict:
                     client_basic_auth_results['username'] = username
                     client_basic_auth_results['groups'].append(basic_auth_group)
 
-    return client_basic_auth_results
+    if 'username' in client_basic_auth_results:
+        merge_auth_info(scope, {'basic': client_basic_auth_results})

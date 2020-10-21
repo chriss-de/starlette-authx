@@ -48,6 +48,13 @@ def has_basic_group(context, group):
     return False
 
 
+def has_oauth2_cookie(context, name=None):
+    config = _get_authx_config(context, 'oauth2_cookie')
+    if len(config) > 0 and (name is None or name in config):
+        return True
+    return False
+
+
 def has_any_auth(context):
     if len(context.parent.get('authx', {})) > 0:
         return True
@@ -63,6 +70,7 @@ _environment.globals.update(
         'has_basic_auth': contextfunction(has_basic_auth),
         'is_basic_user': contextfunction(is_basic_user),
         'has_basic_group': contextfunction(has_basic_group),
+        'has_oauth2_cookie': contextfunction(has_oauth2_cookie),
         'has_any_auth': contextfunction(has_any_auth)
     }
 )
