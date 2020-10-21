@@ -106,14 +106,14 @@ async def process(config, scope: Scope, receive: Receive, send: Send) -> None:
             oauth2_cookie_config['uris'].index(i) for i in oauth2_cookie_config['uris'] if scope['path'].startswith(i)
         ]
         if len(_uri_index) > 0:
+            oauth2_cookie_path = oauth2_cookie_config['uris'][_uri_index[0]]
             oauth2_cookie_config = oauth2_cookie_config['config']
             if 'only_if_not' in oauth2_cookie_config:
                 _condition = oauth2_cookie_config['only_if_not']
-                _res = validator(f"not ({_condition})", config=scope.get('authx', {}))
+                _res = validator(f"{_condition}", config=scope.get('authx', {}))
                 if _res:
                     continue
 
-            oauth2_cookie_path = oauth2_cookie_config['uris'][_uri_index[0]]
             http_connection = HTTPConnection(scope)
 
             # do we have a cookie?
